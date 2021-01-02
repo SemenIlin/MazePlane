@@ -27,13 +27,13 @@ public class SaveManager : MonoBehaviour
 
     public void SaveGame()
     {
-
         using (var fs = new FileStream(filePath, FileMode.Create))
         {
             var bf = new BinaryFormatter();
             var save = new Save();
-            //save.Level = Player.CurrentScene == 0 ? 2 : Player.CurrentScene;
-            save.Level = 2;
+            save.Level = Player.CurrentScene == 0 ? 2 : Player.CurrentScene;
+            save.Page = LevelContentScroll.SelectedPage;
+            save.SliderSpeed = SliderUpperSpeed.Speed;
             bf.Serialize(fs, save);
         }
     }
@@ -52,6 +52,8 @@ public class SaveManager : MonoBehaviour
             var save = (Save)bf.Deserialize(fs);
 
             Player.CurrentScene = save.Level;
+            LevelContentScroll.SelectedPage = save.Page;
+            SliderUpperSpeed.Speed = save.SliderSpeed;
         }
     }
 
@@ -59,5 +61,7 @@ public class SaveManager : MonoBehaviour
     public class Save
     {
         public int Level;
+        public int Page;
+        public float SliderSpeed;
     }
 }

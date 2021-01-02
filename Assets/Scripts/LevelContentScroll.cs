@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class LevelContentScroll : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
@@ -14,12 +12,12 @@ public class LevelContentScroll : MonoBehaviour, IBeginDragHandler, IDragHandler
 
     private Vector2 _tapPoint;
     private Vector2 _endPoint;
-    private int _selectedPage;
     private int _quaintityPages;
+
+    public static int SelectedPage;
 
     private void Start()
     {
-        _selectedPage = 0;
         _contentRect = _content.GetComponent<RectTransform>();
         if (_pagesWithLevels == null || _pagesWithLevels.Length == 0)
             return;
@@ -30,37 +28,48 @@ public class LevelContentScroll : MonoBehaviour, IBeginDragHandler, IDragHandler
             _positionsOfPages[i] = -_pagesWithLevels[i].transform.localPosition;
         }
         _quaintityPages = _positionsOfPages.Length;
+
+        ChangePage();
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
         _tapPoint = Input.mousePosition;
-        Debug.Log(_tapPoint);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
         _endPoint = Input.mousePosition;
-        Debug.Log(_endPoint);
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
         if (_tapPoint.x - _endPoint.x >= _deltaSwipe)
         {
-            if (_selectedPage == _quaintityPages - 1)
-                return;
-
-            _selectedPage++;
-            _contentRect.anchoredPosition = _positionsOfPages[_selectedPage];
+            NextPage();
         }
         else if (_endPoint.x - _tapPoint.x >= _deltaSwipe)
         {
-            if (_selectedPage == 0)
-                return;
-
-            _selectedPage--;
-            _contentRect.anchoredPosition = _positionsOfPages[_selectedPage];
+            PreviousPage();
         }
+    }
+    private void ChangePage() => _contentRect.anchoredPosition = _positionsOfPages[SelectedPage];
+    private void NextPage()
+    {
+        if (SelectedPage == _quaintityPages - 1)
+            return;
+
+        ++SelectedPage;
+
+        ChangePage();
+    }
+    
+    private void PreviousPage()
+    {
+        if (SelectedPage == 0)
+            return;
+
+        --SelectedPage;
+        ChangePage();
     }
 }

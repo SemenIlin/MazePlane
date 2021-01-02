@@ -4,7 +4,10 @@ using UnityEngine.UI;
 
 public class LevelController : MonoBehaviour
 {
+    public const int TOTAL_QUANTITY_SCENES = 21;
+
     [SerializeField] private Button[] _levels;
+
     private int _levelComplete;
     private void Start()
     {

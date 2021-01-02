@@ -4,7 +4,8 @@ using UnityEngine.SceneManagement;
 public class ButtonController : MonoBehaviour
 {
     private const int QUANTITY_NON_GAME_SCENES = 2;
-    private const int QUANTITY_GAME_SCENES = 6;
+    [SerializeField] private int _countLevelsOnPages;
+
     private int _levelComplete;
     public static ButtonController Instance { get; private set; }
     private void Start()
@@ -21,8 +22,8 @@ public class ButtonController : MonoBehaviour
 
     public void ContinueGame()
     {
-        SceneManager.LoadScene(Player.CurrentScene);
         SaveManager.Instance.LoadGame();
+        SceneManager.LoadScene(Player.CurrentScene);
     }
 
     public void OpenScene(int lvl1)
@@ -37,19 +38,26 @@ public class ButtonController : MonoBehaviour
     public void Reset()
     {
         Player.CurrentScene = 2;
+        LevelContentScroll.SelectedPage = 0;
         SaveManager.Instance.SaveGame();
         PlayerPrefs.DeleteAll();
+        SaveManager.Instance.SaveGame();
     }
 
     public void IsEndGame()
     {
-        if (QUANTITY_GAME_SCENES == Player.CurrentScene)
+        if (LevelController.TOTAL_QUANTITY_SCENES == Player.CurrentScene)
             Invoke("LoadLevelScene", 1f);
         else
         {
             if (_levelComplete < Player.CurrentScene)
                 PlayerPrefs.SetInt("LevelComplete", Player.CurrentScene - QUANTITY_NON_GAME_SCENES);
-            Invoke("NextLevel", 1f);
+            if (PlayerPrefs.GetInt("LevelComplete") % _countLevelsOnPages == 0)
+            {
+                ++LevelContentScroll.SelectedPage;
+            }
+
+            Invoke("NextLevel", 1f); 
         }
     }
 
